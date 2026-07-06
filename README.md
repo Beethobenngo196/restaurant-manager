@@ -14,7 +14,10 @@ QuanLyNhaHang_Nhom6/
 │   ├── restaurant.txt    # Data món ăn/hóa đơn
 │   └── history.txt       # Data lịch sử thao tác
 │
-└── README.md
+└── README.md 
+    API_SPEC.md 
+    CONTRIBUTING.md 
+    WORKFLOW.md
 
 
 DỰ ÁN: HỆ THỐNG QUẢN LÝ NHÀ HÀNG 
