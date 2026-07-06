@@ -15,7 +15,8 @@ QuanLyNhaHang_Nhom6/
 │   ├── restaurant.txt    # Data món ăn/hóa đơn
 │   └── history.txt       # Data lịch sử thao tác
 │
-└── README.mdA
+└── README.md
+A
 - Linked List
 - CRUD
 - File
