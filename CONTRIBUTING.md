@@ -1,4 +1,21 @@
-A
+_________________________Cấu Trúc cây thư mục
+QuanLyNhaHang_Nhom6/
+│
+├── bin/                  # Chứa file thực thi (.exe) sau khi biên dịch
+├── src/                  # Chứa các file mã nguồn C
+│   ├── main.c            # Hàm main chứa Menu tổng
+│   ├── phat.c            # Code xử lý List & File
+│   ├── trung.c           # Code xử lý Stack, Queue, Lịch sử
+│   └── long.c            # Code xử lý BST, Sắp xếp
+│
+├── include/              # Chứa các file thư viện tự định nghĩa
+│   └── restaurant.h      # File định nghĩa Struct và khai báo hàm chung
+│
+├── data/                 # Chứa các file text lưu trữ dữ liệu
+│   ├── restaurant.txt    # Data món ăn/hóa đơn
+│   └── history.txt       # Data lịch sử thao tác
+│
+└── README.mdA
 - Linked List
 - CRUD
 - File
@@ -44,3 +61,7 @@ Leader Pull/Merge
         │
         ▼
 Build + Test
+
+
+
+
