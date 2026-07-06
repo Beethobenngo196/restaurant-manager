@@ -1,0 +1,10 @@
+MON01,Pho Bo Kobe,75000
+MON02,Com Tam Suon Bi Cha,55000
+MON03,Tra Da,5000
+MON04,Ca Phe Sua Da,25000
+MON05,Lau Thai Tom Yum,250000
+MON06,Goi Cuon Tom Thit,12000
+MON07,Nuoc Ep Cam,30000
+MON08,Mi Cay Sasin Cap 7,45000
+MON09,Ga Ran Phan Nhom,120000
+MON10,Kem Khoai Mon,15000
