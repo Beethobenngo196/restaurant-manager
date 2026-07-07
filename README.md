@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 QuanLyNhaHang_Nhom6/
 │
 ├── bin/                  # Chứa file thực thi (.exe) sau khi biên dịch
@@ -18,52 +19,162 @@ QuanLyNhaHang_Nhom6/
     API_SPEC.md 
     CONTRIBUTING.md 
     WORKFLOW.md
+=======
+# 🍽️ Restaurant Manager
+>>>>>>> 092f783 (fix README.md)
 
+> Hệ thống quản lý nhà hàng được xây dựng bằng ngôn ngữ **C**, mô phỏng quy trình quản lý thực đơn, đặt món và lưu trữ dữ liệu bằng các cấu trúc dữ liệu cơ bản và nâng cao.
 
-DỰ ÁN: HỆ THỐNG QUẢN LÝ NHÀ HÀNG 
-Ngôn ngữ: C
-Nhóm thực hiện: Nhóm 6
+---
 
-I. MỤC TIÊU DỰ ÁN
-Xây dựng một chương trình console mô phỏng hoạt động vận hành của một nhà hàng, bao gồm việc quản lý thực đơn, đặt món và lưu vết hoạt động. Hệ thống yêu cầu tích hợp các cấu trúc dữ liệu cơ bản (Danh sách) và nâng cao (Stack, Queue, BST).
+## 📌 Thông tin dự án
 
-II. YÊU CẦU CHỨC NĂNG CỐT LÕI (CRUD)
-Phần này đảm bảo dữ liệu nền tảng cho toàn bộ hệ thống:
+| Thuộc tính | Nội dung |
+|------------|----------|
+| Ngôn ngữ | C |
+| Môn học | Cấu trúc dữ liệu & Giải thuật |
+| Nhóm | Nhóm 6 |
 
-Thêm & Nhập liệu: Nhập thông tin món ăn (Mã, Tên, Giá, Loại). Bắt buộc phải có thuật toán kiểm tra trùng Mã món ăn trước khi lưu.
+---
 
-Hiển thị: In danh sách món ăn ra console dưới định dạng bảng chuẩn xác.
+# 🎯 Mục tiêu
 
-Tìm kiếm: Hỗ trợ tìm kiếm thông tin theo Mã món, Tên món, hoặc Khoảng giá.
+Xây dựng chương trình **Console Application** mô phỏng hoạt động quản lý của một nhà hàng.
 
-Xóa & Sửa: Cho phép cập nhật giá tiền hoặc xóa món ăn khỏi thực đơn theo Mã hoặc Tên.
+Hệ thống hỗ trợ:
 
-Sắp xếp: Sắp xếp danh sách tăng/giảm dựa trên Giá tiền hoặc Tên món.
+- Quản lý thực đơn
+- Quản lý đặt món
+- Lưu và đọc dữ liệu từ file
+- Ghi lịch sử thao tác
+- Ứng dụng các cấu trúc dữ liệu:
+  - Danh sách liên kết (Linked List)
+  - Ngăn xếp (Stack)
+  - Hàng đợi (Queue)
+  - Cây nhị phân tìm kiếm (BST)
 
-Quản lý File: Toàn bộ dữ liệu phải được lưu xuống file text và tự động load lên khi khởi động chương trình.
+---
 
-III. YÊU CẦU TÍCH HỢP DSA NÂNG CAO
-Phần này mô phỏng các nghiệp vụ thực tế của nhà hàng:
+# ✨ Chức năng chính
 
-Tính năng Hoàn tác (Dùng Stack): Lưu lại trạng thái của các lệnh Thêm/Xóa/Sửa. Khi gọi hàm Undo (Lấy từ đỉnh Stack), hệ thống phải phục hồi lại trạng thái trước đó.
+## 📋 Quản lý thực đơn (CRUD)
 
-Quản lý luồng Đặt món (Dùng Queue): Khách hàng gọi món sẽ được đưa vào Hàng đợi. Bếp sẽ xử lý trả món theo nguyên tắc FIFO (Vào trước, phục vụ trước).
+| Chức năng | Mô tả |
+|-----------|------|
+| ➕ Thêm món | Thêm món mới, kiểm tra trùng mã trước khi lưu |
+| 📄 Hiển thị | In danh sách món theo dạng bảng |
+| 🔍 Tìm kiếm | Theo mã, tên hoặc khoảng giá |
+| ✏️ Cập nhật | Sửa tên hoặc giá món ăn |
+| ❌ Xóa | Xóa món theo mã hoặc tên |
+| ↕️ Sắp xếp | Theo tên hoặc giá (tăng/giảm) |
+| 💾 File | Tự động lưu và đọc dữ liệu từ `restaurant.txt` |
 
-Truy xuất tốc độ cao (Dùng Cây BST): Đưa dữ liệu Mã món ăn vào Cây nhị phân tìm kiếm để tối ưu hóa thời gian tìm kiếm. Hỗ trợ in dữ liệu theo 3 phép duyệt cây (Preorder, Inorder, Postorder).
+---
 
-Thống kê & Ghi Log: Tính tổng doanh thu bán hàng và tính giá trị trung bình của thực đơn. Ghi vết mọi thao tác thay đổi dữ liệu (Ví dụ: Thêm MON001) vào file history.txt.
+# 🚀 Ứng dụng Cấu trúc Dữ liệu
 
+## 📚 Stack (Undo)
 
-                                                       General data
-Mọi tính năng từ Hàng đợi (Queue), Ngăn xếp (Stack) cho đến Cây nhị phân (BST) của hệ thống quản lý nhà hàng đều thao tác trên một đối tượng chung: Món ăn. 
+Lưu lịch sử các thao tác:
 
-##                 ##
-typedef struct {
+- Thêm món
+- Xóa món
+- Sửa món
+
+Khi người dùng chọn **Undo**, chương trình lấy dữ liệu từ đỉnh Stack để khôi phục trạng thái trước đó.
+
+---
+
+## 📥 Queue (Đặt món)
+
+Mô phỏng quá trình phục vụ trong nhà hàng.
+
+- Khách gọi món → Thêm vào Queue
+- Bếp chế biến → Lấy món đầu Queue
+
+Áp dụng nguyên tắc:
+
+> **FIFO (First In - First Out)**
+
+---
+
+## 🌳 Binary Search Tree (BST)
+
+Đưa **Mã món ăn** vào cây BST nhằm tăng tốc độ tìm kiếm.
+
+Hỗ trợ:
+
+- Preorder
+- Inorder
+- Postorder
+
+---
+
+# 📊 Thống kê
+
+Hệ thống hỗ trợ:
+
+- Tổng doanh thu
+- Giá trung bình của thực đơn
+- Số lượng món ăn
+
+Đồng thời ghi toàn bộ thao tác vào file:
+
+```text
+history.txt
+```
+
+Ví dụ:
+
+```text
+[10:15] ADD    MON001
+[10:17] UPDATE MON002
+[10:20] DELETE MON005
+```
+
+---
+
+# 🗂 Cấu trúc dữ liệu chính
+
+Toàn bộ hệ thống (CRUD, Stack, Queue, BST) đều thao tác trên một đối tượng chung là **Món ăn**.
+
+```c
+typedef struct
+{
     char maMon[20];
     char tenMon[50];
     int giaTien;
 } MonAn;
-##                 ##
+```
 
-File restaurant.h
+Định nghĩa tại:
 
+```text
+restaurant.h
+```
+
+---
+
+# 📁 Dữ liệu
+
+| File | Chức năng |
+|------|-----------|
+| restaurant.txt | Lưu danh sách món ăn |
+| history.txt | Lưu lịch sử thao tác |
+
+---
+
+# 🛠 Công nghệ sử dụng
+
+- Ngôn ngữ C
+- Linked List
+- Stack
+- Queue
+- Binary Search Tree (BST)
+- File Handling
+
+---
+
+# 👥 Nhóm thực hiện
+
+**Nhóm 6**
