@@ -15,8 +15,17 @@ QuanLyNhaHang_Nhom6/
 │   ├── restaurant.txt    # Data món ăn/hóa đơn
 │   └── history.txt       # Data lịch sử thao tác
 │
+<<<<<<< HEAD
 └── README.md
 A
+=======
+└── README.md 
+    API_SPEC.md 
+    CONTRIBUTING.md 
+    WORKFLOW.md
+
+
+>>>>>>> a165e33 (1)
 - Linked List
 - CRUD
 - File
