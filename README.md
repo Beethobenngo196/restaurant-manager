@@ -1,8 +1,5 @@
-
-=======
 # 🍽️ Restaurant Manager
->>>>>>> 092f783 (fix README.md)
-
+ 
 > Hệ thống quản lý nhà hàng được xây dựng bằng ngôn ngữ **C**, mô phỏng quy trình quản lý thực đơn, đặt món và lưu trữ dữ liệu bằng các cấu trúc dữ liệu cơ bản và nâng cao.
 
 ---
