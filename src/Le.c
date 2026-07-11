@@ -144,7 +144,7 @@ void pushUndo(StackNode** top, LoaiThaoTac loai, MonAn mon)
 }
 
 /*
- * [LOGIC SIÊU ĐỈNH CỦA BẠN]: Lấy ra thao tác gần nhất và KHÔI PHỤC DỮ LIỆU THẬT
+ *  Hoan tac thao tac cuoi cung trong ngan xep
  */
 void popUndo(StackNode** top, Node** headMainList)
 {
