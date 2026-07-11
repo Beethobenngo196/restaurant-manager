@@ -23,6 +23,13 @@ typedef struct Node {
     struct Node* next;
 } Node;
 
+// ---> [BỔ SUNG CHO MODULE 2]: Thêm OrderNode (Hàng đợi có số lượng)
+typedef struct OrderNode {
+    MonAn data;
+    int soLuong;
+    struct OrderNode* next;
+} OrderNode;
+
 // 1.3. Cấu trúc riêng cho Stack (Phục vụ Undo Thêm/Xóa/Sửa)
 typedef enum {
     THEM,
@@ -35,6 +42,14 @@ typedef struct StackNode {
     MonAn thongTinCu;    // Lưu lại trạng thái của món ăn để phục hồi
     struct StackNode* next;
 } StackNode;
+
+// ---> [BỔ SUNG CHO MODULE 2]: Thêm HistoryNode (Danh sách kép cho Nhật ký)
+typedef struct HistoryNode {
+    char timestamp[10];
+    char description[150];
+    struct HistoryNode* prev;
+    struct HistoryNode* next;
+} HistoryNode;
 
 // 1.4. Cấu trúc TreeNode (Dùng riêng cho Cây nhị phân tìm kiếm - BST)
 typedef struct TreeNode {
@@ -49,9 +64,12 @@ typedef struct TreeNode {
 ========================================================= */
 
 // ---------------------------------------------------------
-// NHIỆM VỤ 1 : Quản lý Danh sách & File I/O (CRUD)
+// NHIỆM VỤ 1 : Quản lý Danh sách & File I/O (CRUD) - GIỮ NGUYÊN 100%
 // ---------------------------------------------------------
+
 void khoiTaoDanhSach(Node** head);
+
+
 int kiemTraTrungMa(Node* head, char* maMon);
 void themMonAn(Node** head, MonAn monMoi);
 void hienThiDanhSach(Node* head);
@@ -63,26 +81,34 @@ void ghiDuLieuRaFile(Node* head, const char* tenFile);
 
 // Giải phóng bộ nhớ cho Danh sách liên kết
 void giaiPhongDanhSach(Node* head);
+
 // ---------------------------------------------------------
 // NHIỆM VỤ 2 : Stack (Undo), Queue (Order) & Lịch sử
+// ---> [CHỈ CẬP NHẬT CHỮ KÝ HÀM BLOCK NÀY CHO KHỚP VỚI LE.C]
 // ---------------------------------------------------------
 // Xử lý Stack (Hoàn tác)
 void pushUndo(StackNode** top, LoaiThaoTac loai, MonAn mon);
 void popUndo(StackNode** top, Node** headMainList);
 
 // Xử lý Queue (Đặt món - FIFO)
-void enqueueOrder(Node** front, Node** rear, MonAn mon);
-MonAn dequeueOrder(Node** front, Node** rear);
+void enqueueOrder(OrderNode** front, OrderNode** rear, MonAn mon, int soLuong);
+void dequeueOrder(OrderNode** front, OrderNode** rear);
 
-// Lưu vết thao tác & Thống kê
-void ghiLichSuThaoTac(const char* hanhDong, const char* maMon);
-long long tinhTongDoanhThu(Node* queueDaPhucVu);
+// Lưu vết thao tác (Danh sách kép) & Thống kê
+void addHistory(HistoryNode** head, HistoryNode** tail, char* description);
+void ghiFileHistory(HistoryNode* head, const char* tenFile);
+long long tinhTongDoanhThu(OrderNode* queueDaPhucVu);
 double tinhGiaTrungBinhMenu(Node* head);
-// Giải phong bộ nhớ cho Queue và Stack
-void giaiPhongQueue(Node** front);
+void thongKeDuLieu(OrderNode* queueHead, Node* menuHead);
+
+// Giải phóng bộ nhớ cho Queue, Stack, History
+void giaiPhongQueue(OrderNode** front);
 void giaiPhongStack(StackNode** top);
+void giaiPhongHistory(HistoryNode** head);
+void giaiPhongModule2(OrderNode** queueHead, StackNode** undoTop, HistoryNode** historyHead);
+
 // ---------------------------------------------------------
-// NHIỆM VỤ 3 : Cây BST (Tìm kiếm), Sắp xếp danh sách
+// NHIỆM VỤ 3 : Cây BST (Tìm kiếm), Sắp xếp danh sách - GIỮ NGUYÊN 100%
 // ---------------------------------------------------------
 // Xử lý Cây nhị phân tìm kiếm
 TreeNode* themVaoCayBST(TreeNode* root, MonAn mon);
@@ -98,4 +124,5 @@ void sapXepTheoMa(Node** head, int tangDan);
 void sapXepTangTheoGia(Node** head, int tangDan);
 // Giải phóng bộ nhớ cho Cây BST
 void giaiPhongCay(TreeNode* root);
+
 #endif
