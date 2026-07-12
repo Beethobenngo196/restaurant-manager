@@ -343,8 +343,16 @@ int main(void)
 
     int luaChon;
 
-    // 2. Tự động nạp dữ liệu từ file data/restaurant.txt lúc khởi động
+    // 2. Tự động nạp dữ liệu từ file lúc khởi động & Đồng bộ sang cây BST
     docDuLieuTuFile(&menuHead, FILE_MENU);
+    
+    Node* p = menuHead;
+    while (p != NULL)
+    {
+        bstRoot = themVaoCayBST(bstRoot, p->data);
+        p = p->next;
+    }
+
     addHistory(&histHead, &histTail, "He thong khoi dong va nap du lieu tu data/restaurant.txt");
 
     // 3. Vòng lặp Menu chính
@@ -401,9 +409,26 @@ int main(void)
                 }
                 else if (chonFile == 2)
                 {
+                    // [UX IMPROVEMENT]: 1. Dọn sạch Menu & BST cũ trong RAM trước để không bị lỗi trùng mã
+                    giaiPhongDanhSach(menuHead);
+                    menuHead = NULL;
+
+                    giaiPhongCay(bstRoot);
+                    bstRoot = NULL;
+
+                    // 2. Nạp lại từ đầu vào RAM sạch
                     docDuLieuTuFile(&menuHead, FILE_MENU);
+
+                    // 3. Đồng bộ dữ liệu vừa đọc sang cây BST của Hoàng
+                    Node* ptr = menuHead;
+                    while (ptr != NULL)
+                    {
+                        bstRoot = themVaoCayBST(bstRoot, ptr->data);
+                        ptr = ptr->next;
+                    }
+
                     addHistory(&histHead, &histTail, "Nap lai du lieu thuc don tu file restaurant.txt");
-                    printf("=> Da khoi phuc thuc don tu file vao RAM!\n");
+                    printf("=> Da khoi phuc thuc don tu file vao RAM thanh cong!\n");
                 }
                 else
                 {

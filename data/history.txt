@@ -1,0 +1,10 @@
+[23:04] He thong khoi dong va nap du lieu tu data/restaurant.txt
+[23:04] Nap lai du lieu thuc don tu file restaurant.txt
+[23:05] Sao luu thuc don ra file restaurant.txt
+[23:06] Them mon moi: [ad - 1]
+[23:07] Nap lai du lieu thuc don tu file restaurant.txt
+[23:13] Thuc hien hoan tac (Undo)
+[23:13] Thuc hien hoan tac (Undo)
+[23:14] Xoa mon an: [MONAN11 - Bo kho]
+[23:14] Xoa mon an: [M11 - ad]
+[23:15] Thuc hien hoan tac (Undo)
