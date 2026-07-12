@@ -23,7 +23,7 @@ typedef struct Node {
     struct Node* next;
 } Node;
 
-//  OrderNode (Hàng đợi có số lượng)
+// 1.2. Cấu trúc OrderNode (Hàng đợi có số lượng)
 typedef struct OrderNode {
     MonAn data;
     int soLuong;
@@ -43,7 +43,7 @@ typedef struct StackNode {
     struct StackNode* next;
 } StackNode;
 
-// HistoryNode (Danh sách kép cho Nhật ký)
+// 1.3. Cấu trúc HistoryNode (Danh sách kép - Lưu vết thao tác)    
 typedef struct HistoryNode {
     char timestamp[10];
     char description[150];

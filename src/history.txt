@@ -1,0 +1,10 @@
+[14:01] He thong khoi dong va nap du lieu tu menu.txt
+[14:05] Them mon moi: [M02 - Bo kho]
+[14:24] Khach order: [Pho] x 4
+[14:24] Khach order: [Pho] x 2
+[14:24] Bep hoan thanh va phuc vu 1 don hang trong Queue
+[14:25] Bep hoan thanh va phuc vu 1 don hang trong Queue
+[14:25] Bep hoan thanh va phuc vu 1 don hang trong Queue
+[14:26] Thuc hien hoan tac (Undo) thao tac gan nhat
+[14:27] Bep hoan thanh va phuc vu 1 don hang trong Queue
+[14:27] Sua gia mon [M01] tu 100 thanh 33 VND
