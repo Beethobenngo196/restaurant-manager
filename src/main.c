@@ -1,9 +1,11 @@
 #include "../include/restaurant.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 /*=========================================================
     CAU HINH DUONG DAN FILE DU LIEU (MACROS)
 =========================================================*/
-// Lùi ra khỏi phòng src/ (dùng ../) để truy cập vào folder data/
 #define FILE_MENU "../data/restaurant.txt"
 #define FILE_HIST "../data/history.txt"
 
@@ -11,41 +13,30 @@
     CAC HAM HO TRO NHAP LIEU & GIAO DIEN (UI WRAPPERS)
 =========================================================*/
 
-/*
- * Xoa bo nho dem, chong troi lenh khi nhap chuoi sau khi nhap so
- */
 static void xoaBoNhoDem(void)
 {
     int c;
     while ((c = getchar()) != '\n' && c != EOF)
     {
-        // Vòng lặp rỗng để hút sạch ký tự thừa trong bộ nhớ đệm
+        // Vong lap rong de hut sach ky tu thua trong bo nho dem
     }
 }
 
-/*
- * Tim nhanh mon an theo ma de lay thong tin cu (Phục vụ Undo)
- */
 static int layThongTinMonCu(Node* head, char* maMon, MonAn* monCu)
 {
     Node* p = head;
-
     while (p != NULL)
     {
         if (strcmp(p->data.maMon, maMon) == 0)
         {
             *monCu = p->data;
-            return 1; // Tìm thấy
+            return 1;
         }
         p = p->next;
     }
-
-    return 0; // Không tìm thấy
+    return 0;
 }
 
-/*
- * Giao dien: Them mon an moi (Case 2 - Module 1 Phat)
- */
 static void uiThemMon(Node** menuHead, StackNode** undoTop, HistoryNode** histHead, HistoryNode** histTail, TreeNode** bstRoot)
 {
     MonAn monMoi;
@@ -68,11 +59,8 @@ static void uiThemMon(Node** menuHead, StackNode** undoTop, HistoryNode** histHe
     scanf("%d", &monMoi.giaTien);
     xoaBoNhoDem();
 
-    // 1. Thêm vào Danh sách liên kết (Phát)
     themMonAn(menuHead, monMoi);
-    // 2. Thêm vào cây BST tốc độ cao (Hoàng)
     *bstRoot = themVaoCayBST(*bstRoot, monMoi);
-    // 3. Ghi vào Stack Undo & Nhật ký hệ thống (Lê)
     pushUndo(undoTop, THEM, monMoi);
 
     char logMsg[150];
@@ -82,21 +70,15 @@ static void uiThemMon(Node** menuHead, StackNode** undoTop, HistoryNode** histHe
     printf("=> Them mon an thanh cong!\n");
 }
 
-/*
- * Giao dien: Xoa mon an theo Ma (Case 3) - DA TU DONG HIEN MENU TRUOC
- */
 static void uiXoaMon(Node** menuHead, StackNode** undoTop, HistoryNode** histHead, HistoryNode** histTail)
 {
     char maXoa[20];
     MonAn monCu;
 
     printf("\n--- XOA MON AN ---\n");
-    
-    // [UX IMPROVEMENT]: In danh sách ra trước để người dùng nhìn mã món
-    printf("Danh sach thuc don hien tai:\n");
     hienThiDanhSach(*menuHead); 
 
-    printf("=> Nhap MA MON can xoa tu danh sach tren: ");
+    printf("=> Nhap MA MON can xoa tu bang tren: ");
     scanf("%19s", maXoa);
     xoaBoNhoDem();
 
@@ -116,9 +98,6 @@ static void uiXoaMon(Node** menuHead, StackNode** undoTop, HistoryNode** histHea
     }
 }
 
-/*
- * Giao dien: Cap nhat gia mon an (Case 4) - DA TU DONG HIEN MENU TRUOC
- */
 static void uiSuaGia(Node* menuHead, StackNode** undoTop, HistoryNode** histHead, HistoryNode** histTail)
 {
     char maSua[20];
@@ -126,12 +105,9 @@ static void uiSuaGia(Node* menuHead, StackNode** undoTop, HistoryNode** histHead
     MonAn monCu;
 
     printf("\n--- CAP NHAT GIA MON AN ---\n");
-    
-    // [UX IMPROVEMENT]: In danh sách ra trước để người dùng chọn mã món
-    printf("Danh sach thuc don hien tai:\n");
     hienThiDanhSach(menuHead);
 
-    printf("=> Nhap MA MON can sua gia tu danh sach tren: ");
+    printf("=> Nhap MA MON can sua gia tu bang tren: ");
     scanf("%19s", maSua);
     xoaBoNhoDem();
 
@@ -156,9 +132,6 @@ static void uiSuaGia(Node* menuHead, StackNode** undoTop, HistoryNode** histHead
     }
 }
 
-/*
- * Giao dien: Dat mon vao Bep (Case 6 - Module 2 Le)
- */
 static void uiDatMon(Node* menuHead, OrderNode** queueFront, OrderNode** queueRear, HistoryNode** histHead, HistoryNode** histTail)
 {
     char maOrder[20];
@@ -166,7 +139,6 @@ static void uiDatMon(Node* menuHead, OrderNode** queueFront, OrderNode** queueRe
     MonAn monOrder;
 
     printf("\n--- DAT MON (SEND TO KITCHEN QUEUE) ---\n");
-    printf("Danh sach thuc don hien tai:\n");
     hienThiDanhSach(menuHead);
 
     printf("=> Nhap MA MON khach goi: ");
@@ -198,7 +170,7 @@ static void uiDatMon(Node* menuHead, OrderNode** queueFront, OrderNode** queueRe
 }
 
 /*
- * Giao dien: Tim kiem mon an (Case 10 - Module 3 Hoang)
+ * [UX NANG CAP]: Hien thi thuc don truoc khi hoi nhap tu khoa tim kiem
  */
 static void uiTimKiem(Node* menuHead, TreeNode* bstRoot)
 {
@@ -206,60 +178,69 @@ static void uiTimKiem(Node* menuHead, TreeNode* bstRoot)
     printf("\n--- TIM KIEM MON AN ---\n");
     printf("1. Tim theo Ten mon an (Linked List - Phat)\n");
     printf("2. Tim theo Khoang gia (Linked List - Phat)\n");
-    printf("3. Tim theo Ma mon (Cay BST toc do cao - Hoang)\n");
+    printf("3. Tim theo Ma mon (Cay BST toc do cao O(log n) - Hoang)\n");
     printf("=> Chon (1-3): ");
     scanf("%d", &chonTim);
     xoaBoNhoDem();
 
     if (chonTim == 1)
     {
+        printf("\n--- DANH SACH THUC DON HIEN TAI ---\n");
+        hienThiDanhSach(menuHead);
+        
         char tenTim[50];
-        printf("Nhap ten mon can tim: ");
+        printf("=> Nhap TEN MON can tim tu bang tren: ");
         scanf("%49[^\n]", tenTim);
         xoaBoNhoDem();
         timKiemTheoTen(menuHead, tenTim);
     }
     else if (chonTim == 2)
     {
+        printf("\n--- DANH SACH THUC DON HIEN TAI ---\n");
+        hienThiDanhSach(menuHead);
+
         int min, max;
-        printf("Nhap gia thap nhat (Min): ");
+        printf("=> Nhap gia thap nhat (Min - VND): ");
         scanf("%d", &min);
-        printf("Nhap gia cao nhat (Max): ");
+        printf("=> Nhap gia cao nhat (Max - VND): ");
         scanf("%d", &max);
         xoaBoNhoDem();
         timKiemTheoKhoangGia(menuHead, min, max);
     }
     else if (chonTim == 3)
     {
+        printf("\n--- BANG MA MON TREN CAY BST (DA SAP XEP TANG DAN A -> Z) ---\n");
+        printf("%-10s | %-30s | %-15s\n", "MA MON", "TEN MON AN", "GIA TIEN (VND)");
+        printf("-----------------------------------------------------------\n");
+        duyetCayInorder(bstRoot); // => Goi In-order de show thuc don da sap xep!
+        printf("-----------------------------------------------------------\n");
+
         char maTim[20];
-        printf("Nhap ma mon can tim tren cay BST: ");
+        printf("=> Nhap MA MON can tim tu bang tren (vd: MON05): ");
         scanf("%19s", maTim);
         xoaBoNhoDem();
 
         TreeNode* ketQua = timKiemTheoMaBST(bstRoot, maTim);
         if (ketQua != NULL)
         {
-            printf("\n[TIM THAY TREN BST] => Ma: %s | Ten: %s | Gia: %d VND\n",
+            printf("\n>>> [TIM THAY TREN BST] => Ma: %s | Ten: %s | Gia: %d VND <<<\n",
                    ketQua->data.maMon, ketQua->data.tenMon, ketQua->data.giaTien);
         }
-        else
+        else 
         {
             printf("\n[KHONG TIM THAY] Khong co mon [%s] tren cay BST!\n", maTim);
         }
     }
-    else
+    else 
     {
         printf("Lua chon khong hop le!\n");
     }
 }
 
-/*
- * Giao dien: Sap xep thuc don (Case 11 - Module 3 Hoang)
- */
 static void uiSapXep(Node** menuHead)
 {
     int chonSapXep, tangDan;
-    printf("\n--- SAP XEP THUC DON (HOANG) ---\n");
+    printf("\n--- SAP XEP THUC DON (MODULE 1 - PHAT) ---\n");
     printf("1. Sap xep theo MA MON\n");
     printf("2. Sap xep theo TEN MON\n");
     printf("3. Sap xep theo GIA TIEN\n");
@@ -290,62 +271,102 @@ static void uiSapXep(Node** menuHead)
         printf("Lua chon khong hop le!\n");
         return;
     }
-
-    // In ngay danh sách sau khi sắp xếp cho người dùng kiểm chứng
     hienThiDanhSach(*menuHead);
 }
 
-/*
- * In khung Menu chinh cua chung trinh
- */
+static void uiDuyetCayBST(TreeNode* bstRoot)
+{
+    int chonDuyet;
+    printf("\n--- DUYET CAY THUC DON BST (MODULE 3 - HOANG) ---\n");
+    printf("1. Duyet In-order   (LNR) -> In thuc don tu dong sap xep A-Z theo Ma mon\n");
+    printf("2. Duyet Pre-order  (NLR) -> In thu tu Goc -> Trai -> Phai (Kiem tra cau truc cay)\n");
+    printf("3. Duyet Post-order (LRN) -> In thu tu Trai -> Phai -> Goc (Co che don dep RAM)\n");
+    printf("=> Chon phuong phap duyet (1-3): ");
+    scanf("%d", &chonDuyet);
+    xoaBoNhoDem();
+
+    if (bstRoot == NULL)
+    {
+        printf("\n[THONG BAO] Cay BST hien dang trong!\n");
+        return;
+    }
+
+    printf("\n%-10s | %-30s | %-15s\n", "MA MON", "TEN MON AN", "GIA TIEN (VND)");
+    printf("-----------------------------------------------------------\n");
+
+    if (chonDuyet == 1)
+    {
+        duyetCayInorder(bstRoot);
+        printf("-----------------------------------------------------------\n");
+        printf("=> Da in thuc don sap xep tang dan A-Z thanh cong!\n");
+    }
+    else if (chonDuyet == 2)
+    {
+        duyetCayPreorder(bstRoot);
+        printf("-----------------------------------------------------------\n");
+        printf("=> Da in theo cau truc Pre-order thanh cong!\n");
+    }
+    else if (chonDuyet == 3)
+    {
+        duyetCayPostorder(bstRoot);
+        printf("-----------------------------------------------------------\n");
+        printf("=> Da in theo cau truc Post-order thanh cong!\n");
+    }
+    else
+    {
+        printf("Lua chon khong hop le!\n");
+    }
+}
+
 static void inMenuChinh(void)
 {
     printf("\n");
     printf("******************************************************************\n");
-    printf("* CHUNG TRINH QUAN LY NHA HANG - DO AN NHOM 6               *\n");
+    printf("* CHUNG TRINH QUAN LY NHA HANG - DO AN NHOM 5               *\n");
     printf("* (Thanh vien: Phat - Le - Hoang)                     *\n");
     printf("******************************************************************\n");
-    printf("* [MODULE 1: QUAN LY THUC DON - PHAT]                            *\n");
+    printf("* [MODULE 1: QUAN LY & SAP XEP THUC DON - PHAT (LINKED LIST)]    *\n");
     printf("* 1. Hien thi danh sach thuc don                               *\n");
     printf("* 2. Them mon an moi (Co ghi Undo & Log)                       *\n");
     printf("* 3. Xoa mon an theo Ma (Co ghi Undo & Log)                    *\n");
     printf("* 4. Cap nhat gia mon an (Co ghi Undo & Log)                   *\n");
-    printf("* 5. Sao luu / Khoi phuc thuc don thu cong voi file (data/...) *\n");
+    printf("* 5. Sap xep thuc don (Theo Ma / Ten / Gia - Phat)             *\n");
+    printf("* 6. Sao luu / Khoi phuc thuc don thu cong voi file (data/...) *\n");
     printf("* *\n");
-    printf("* [MODULE 2: QUAN LY DON HANG & HOAN TAC - LE]                   *\n");
-    printf("* 6. Dat mon vao hang doi Bep (Queue Order)                    *\n");
-    printf("* 7. Phuc vu mon (Bep lam xong - Dequeue)                      *\n");
-    printf("* 8. HOAN TAC thao tac gan nhat (Ctrl + Z - Stack)             *\n");
-    printf("* 9. Xem & Ghi nhat ky hoat dong ra file (history.txt)         *\n");
+    printf("* [MODULE 2: QUAN LY DON HANG & HOAN TAC - LE (QUEUE & STACK)]   *\n");
+    printf("* 7. Dat mon vao hang doi Bep (Queue Order)                    *\n");
+    printf("* 8. Phuc vu mon (Bep lam xong - Dequeue)                      *\n");
+    printf("* 9. HOAN TAC thao tac gan nhat (Ctrl + Z - Stack)             *\n");
+    printf("* 10. Xem & Ghi nhat ky hoat dong ra file (history.txt)        *\n");
     printf("* *\n");
-    printf("* [MODULE 3: TIM KIEM & SAP XEP - HOANG]                         *\n");
-    printf("* 10. Tim kiem mon an (Theo Ten / Khoang Gia / Cay BST)        *\n");
-    printf("* 11. Sap xep thuc don (Theo Ma / Ten / Gia)                   *\n");
+    printf("* [MODULE 3: TIM KIEM & DUYET CAY BST - HOANG (BINARY TREE)]     *\n");
+    printf("* 11. Tim kiem mon an (Theo Ten / Gia / MaMon (BST))      *\n");
+    printf("* 12. Duyet cay BST thuc don (In-order / Pre-order / Post-order)*\n");
     printf("******************************************************************\n");
     printf("* 0. THOAT CHUNG TRINH & GIAI PHONG BO NHO RAM                 *\n");
     printf("******************************************************************\n");
-    printf("=> Nhap lua chon cua ban (0 - 11): ");
+    printf("=> Nhap lua chon cua ban (0 - 12): ");
 }
 
 /*=========================================================
-    HAM CHINH - MAIN FUNCTION (SIÊU NGẮN, SIÊU SẠCH)
+    HAM CHINH - MAIN FUNCTION
 =========================================================*/
 int main(void)
 {
-    // 1. Khởi tạo các con trỏ quản lý của 3 thành viên
-    Node* menuHead = NULL;          // Phát: Danh sách liên kết thực đơn
-    OrderNode* queueFront = NULL;   // Lê: Đầu hàng đợi đơn hàng
-    OrderNode* queueRear = NULL;    // Lê: Đuôi hàng đợi đơn hàng
-    StackNode* undoTop = NULL;      // Lê: Đỉnh ngăn xếp hoàn tác
-    HistoryNode* histHead = NULL;   // Lê: Đầu danh sách nhật ký
-    HistoryNode* histTail = NULL;   // Lê: Đuôi danh sách nhật ký
-    TreeNode* bstRoot = NULL;       // Hoàng: Gốc cây nhị phân tìm kiếm
+    Node* menuHead = NULL;
+    OrderNode* queueFront = NULL;
+    OrderNode* queueRear = NULL;
+    StackNode* undoTop = NULL;
+    HistoryNode* histHead = NULL;
+    HistoryNode* histTail = NULL;
+    TreeNode* bstRoot = NULL;
 
     int luaChon;
 
-    // 2. Tự động nạp dữ liệu từ file lúc khởi động & Đồng bộ sang cây BST
+    // 1. Doc du lieu tu file vao Danh sach lien ket
     docDuLieuTuFile(&menuHead, FILE_MENU);
     
+    // 2. DONG BO HOA: Nap du lieu tu Linked List vao Cay BST ngay khi khoi dong
     Node* p = menuHead;
     while (p != NULL)
     {
@@ -355,12 +376,10 @@ int main(void)
 
     addHistory(&histHead, &histTail, "He thong khoi dong va nap du lieu tu data/restaurant.txt");
 
-    // 3. Vòng lặp Menu chính
     while (1)
     {
         inMenuChinh();
 
-        // Kiểm tra chống trôi lệnh khi nhập chữ vào ô số
         if (scanf("%d", &luaChon) != 1)
         {
             printf("\n[LOI] Vui long nhap mot so nguyen hop le!\n");
@@ -371,27 +390,12 @@ int main(void)
 
         switch (luaChon)
         {
-            case 1:
-            {
-                hienThiDanhSach(menuHead);
-                break;
-            }
-            case 2:
-            {
-                uiThemMon(&menuHead, &undoTop, &histHead, &histTail, &bstRoot);
-                break;
-            }
-            case 3:
-            {
-                uiXoaMon(&menuHead, &undoTop, &histHead, &histTail);
-                break;
-            }
-            case 4:
-            {
-                uiSuaGia(menuHead, &undoTop, &histHead, &histTail);
-                break;
-            }
-            case 5: // Sao luu / Khoi phuc thu cong (Module 1)
+            case 1: hienThiDanhSach(menuHead); break;
+            case 2: uiThemMon(&menuHead, &undoTop, &histHead, &histTail, &bstRoot); break;
+            case 3: uiXoaMon(&menuHead, &undoTop, &histHead, &histTail); break;
+            case 4: uiSuaGia(menuHead, &undoTop, &histHead, &histTail); break;
+            case 5: uiSapXep(&menuHead); break;
+            case 6:
             {
                 int chonFile;
                 printf("\n--- QUAN LY FILE THUC DON ---\n");
@@ -409,17 +413,13 @@ int main(void)
                 }
                 else if (chonFile == 2)
                 {
-                    // [UX IMPROVEMENT]: 1. Dọn sạch Menu & BST cũ trong RAM trước để không bị lỗi trùng mã
                     giaiPhongDanhSach(menuHead);
                     menuHead = NULL;
-
                     giaiPhongCay(bstRoot);
                     bstRoot = NULL;
 
-                    // 2. Nạp lại từ đầu vào RAM sạch
                     docDuLieuTuFile(&menuHead, FILE_MENU);
 
-                    // 3. Đồng bộ dữ liệu vừa đọc sang cây BST của Hoàng
                     Node* ptr = menuHead;
                     while (ptr != NULL)
                     {
@@ -430,35 +430,27 @@ int main(void)
                     addHistory(&histHead, &histTail, "Nap lai du lieu thuc don tu file restaurant.txt");
                     printf("=> Da khoi phuc thuc don tu file vao RAM thanh cong!\n");
                 }
-                else
-                {
-                    printf("Lua chon khong hop le!\n");
-                }
+                else printf("Lua chon khong hop le!\n");
                 break;
             }
-            case 6:
-            {
-                uiDatMon(menuHead, &queueFront, &queueRear, &histHead, &histTail);
-                break;
-            }
-            case 7:
+            case 7: uiDatMon(menuHead, &queueFront, &queueRear, &histHead, &histTail); break;
+            case 8:
             {
                 printf("\n--- PHUC VU MON AN ---");
                 dequeueOrder(&queueFront, &queueRear);
                 addHistory(&histHead, &histTail, "Bep hoan thanh va phuc vu 1 don hang");
                 break;
             }
-            case 8:
+            case 9:
             {
                 printf("\n--- HOAN TAC THAO TAC GAN NHAT ---");
                 popUndo(&undoTop, &menuHead);
                 addHistory(&histHead, &histTail, "Thuc hien hoan tac (Undo)");
                 break;
             }
-            case 9: // Xem & Ghi nhat ky hoat dong (Module 2 - Le)
+            case 10:
             {
                 printf("\n--- NHAT KY HOAT DONG CUA HE THONG (LOG HISTORY) ---\n");
-                
                 char xacNhan;
                 printf("Ban co muon xuat nhat ky hoat dong ra file %s? (y/n): ", FILE_HIST);
                 scanf("%c", &xacNhan);
@@ -471,40 +463,28 @@ int main(void)
                 }
                 break;
             }
-            case 10:
-            {
-                uiTimKiem(menuHead, bstRoot);
-                break;
-            }
-            case 11:
-            {
-                uiSapXep(&menuHead);
-                break;
-            }
-            case 0: // Thoat & Giai phong bo nho RAM
+            case 11: uiTimKiem(menuHead, bstRoot); break;
+            case 12: uiDuyetCayBST(bstRoot); break;
+            case 0:
             {
                 printf("\n=======================================================\n");
                 printf("DANG DON DEP BO NHO RAM VA THOAT CHUNG TRINH...\n");
                 
-                // Tự động lưu thực đơn ra file restaurant.txt trước khi tắt máy
                 ghiDuLieuRaFile(menuHead, FILE_MENU);
-
-                // Gọi hàm giải phóng RAM của từng module
                 giaiPhongDanhSach(menuHead);
                 giaiPhongModule2(&queueFront, &undoTop, &histHead);
                 giaiPhongCay(bstRoot);
 
                 printf("=> Da giai phong 100%% RAM. Tam biet Nhom 6!\n");
                 printf("=======================================================\n");
-                return 0; // Tắt chương trình thành công
+                return 0;
             }
             default:
             {
-                printf("\n[LOI] Lua chon khong hop le! Vui long nhap tu 0 den 11.\n");
+                printf("\n[LOI] Lua chon khong hop le! Vui long nhap tu 0 den 12.\n");
                 break;
             }
         }
     }
-
     return 0;
 }

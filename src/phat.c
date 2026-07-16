@@ -1,4 +1,35 @@
-#include "restaurant.h"
+#include "../include/restaurant.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+/*=========================================================
+    CAC HAM HO TRO NOI BO (STATIC HELPER FUNCTIONS)
+=========================================================*/
+
+static void inTieuDeBang(void)
+{
+    printf("%-10s | %-30s | %-15s\n",
+           "MA MON",
+           "TEN MON AN",
+           "GIA TIEN (VND)");
+    printf("-----------------------------------------------------------\n");
+}
+
+/*
+ * Ham in 1 mon an
+ */
+void inMonAn(MonAn mon)
+{
+    printf("%-10s | %-30s | %-15d VND\n", mon.maMon, mon.tenMon, mon.giaTien);
+}
+
+static void hoanDoiMonAn(Node* a, Node* b)
+{
+    MonAn temp = a->data;
+    a->data = b->data;
+    b->data = temp;
+}
 
 /*=========================================================
     KHUI TAO & KIEM TRA DU LIEU (INIT & VALIDATION)
@@ -152,7 +183,7 @@ void xoaMonAnTheoTen(Node** head, char* tenMon)
 =========================================================*/
 
 /*
- * Cap nhat gia tien cua mot mon an the ma
+ * Cap nhat gia tien cua mot mon an theo ma
  */
 void capNhatGiaTien(Node* head, char* maMon, int giaMoi)
 {
@@ -270,5 +301,159 @@ void giaiPhongDanhSach(Node* head)
         temp = head;
         head = head->next;
         free(temp);
+    }
+}
+
+/*=========================================================
+    [DA BO SUNG]: MODULE TIM KIEM LIEN KET (SEARCHING)
+    (Chuyen tu hoang.c ve phat.c cho dung ban chat Node*)
+=========================================================*/
+
+/*
+ * Tim kiem theo ten mon tren Linked List
+ */
+void timKiemTheoTen(Node* head, char* tenMon)
+{
+    if (head == NULL)
+    {
+        printf("Danh sach rong.\n");
+        return;
+    }
+
+    Node* p = head;
+    int timThay = 0;
+
+    printf("\n========== KET QUA TIM KIEM THEO TEN ==========\n");
+
+    while (p != NULL)
+    {
+        if (strcmp(p->data.tenMon, tenMon) == 0)
+        {
+            if (!timThay)
+            {
+                inTieuDeBang();
+            }
+
+            inMonAn(p->data);
+            timThay = 1;
+        }
+
+        p = p->next;
+    }
+
+    if (!timThay)
+    {
+        printf("Khong tim thay mon \"%s\".\n", tenMon);
+    }
+}
+
+/*
+ * Tim kiem theo khoang gia tren Linked List
+ */
+void timKiemTheoKhoangGia(Node* head, int giaMin, int giaMax)
+{
+    if (head == NULL)
+    {
+        printf("Danh sach rong.\n");
+        return;
+    }
+
+    Node* p = head;
+    int timThay = 0;
+
+    if (giaMin > giaMax)
+    {
+        int temp = giaMin;
+        giaMin = giaMax;
+        giaMax = temp;
+    }
+
+    printf("\n======= KET QUA TIM KIEM THEO GIA =======\n");
+
+    while (p != NULL)
+    {
+        if (p->data.giaTien >= giaMin && p->data.giaTien <= giaMax)
+        {
+            if (!timThay)
+            {
+                inTieuDeBang();
+            }
+
+            inMonAn(p->data);
+            timThay = 1;
+        }
+
+        p = p->next;
+    }
+
+    if (!timThay)
+    {
+        printf("Khong co mon nao trong khoang gia %d - %d.\n",
+               giaMin,
+               giaMax);
+    }
+}
+
+/*=========================================================
+    MODULE SAP XEP DANH SACH LIEN KET (SORTING)
+=========================================================*/
+
+/*
+ * Sap xep thuc don theo MA MON (1: Tang dan | 0: Giam dan)
+ */
+void sapXepTheoMa(Node** head, int tangDan)
+{
+    if (head == NULL || *head == NULL || (*head)->next == NULL) return;
+
+    for (Node* p = *head; p != NULL; p = p->next)
+    {
+        for (Node* q = p->next; q != NULL; q = q->next)
+        {
+            int cmp = strcmp(p->data.maMon, q->data.maMon);
+            if ((tangDan && cmp > 0) || (!tangDan && cmp < 0))
+            {
+                hoanDoiMonAn(p, q);
+            }
+        }
+    }
+}
+
+/*
+ * Sap xep thuc don theo TEN MON (1: Tang dan | 0: Giam dan)
+ */
+void sapXepTheoTen(Node** head, int tangDan)
+{
+    if (head == NULL || *head == NULL || (*head)->next == NULL) return;
+
+    for (Node* p = *head; p != NULL; p = p->next)
+    {
+        for (Node* q = p->next; q != NULL; q = q->next)
+        {
+            int cmp = strcmp(p->data.tenMon, q->data.tenMon);
+            if ((tangDan && cmp > 0) || (!tangDan && cmp < 0))
+            {
+                hoanDoiMonAn(p, q);
+            }
+        }
+    }
+}
+
+/*
+ * Sap xep thuc don theo GIA TIEN (1: Tang dan | 0: Giam dan)
+ */
+void sapXepTangTheoGia(Node** head, int tangDan)
+{
+    if (head == NULL || *head == NULL || (*head)->next == NULL) return;
+
+    for (Node* p = *head; p != NULL; p = p->next)
+    {
+        for (Node* q = p->next; q != NULL; q = q->next)
+        {
+            if ((tangDan && p->data.giaTien > q->data.giaTien) ||
+                (!tangDan && p->data.giaTien < q->data.giaTien))
+            {
+                hoanDoiMonAn(p, q);
+            }
+        }
     }
 }

@@ -1,439 +1,90 @@
-# WORKFLOW TỔNG THỂ HỆ THỐNG QUẢN LÝ NHÀ HÀNG
-
-Tài liệu này mô tả toàn bộ luồng hoạt động của chương trình từ khi khởi động đến khi kết thúc. Mục đích là để các thành viên trong nhóm hiểu dữ liệu sẽ đi như thế nào và khi nào phần code của mình được sử dụng.
-
----
-
-# GIAI ĐOẠN 1: KHỞI ĐỘNG HỆ THỐNG
-
-## Mục tiêu
-
-Đưa toàn bộ dữ liệu từ file lên bộ nhớ để chương trình sẵn sàng hoạt động.
-
-### Bước 1: Khởi động chương trình
-
-Khi chạy chương trình, hệ thống tạo các cấu trúc dữ liệu cần thiết:
-
-* Linked List (Quản lý danh sách món ăn)
-* Queue (Quản lý khách đặt món)
-* Stack (Lưu thao tác Undo)
-* BST (Tìm kiếm nhanh)
-
-Ban đầu tất cả đều rỗng.
+<div align="center">
+  <h1>🚀 BẢN ĐỒ LUỒNG HOẠT ĐỘNG (WORKFLOW)</h1>
+  <p><b>Hệ Thống Quản Lý Nhà Hàng - Nhóm 5</b></p>
+  
+  [![C](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
+  [![Architecture](https://img.shields.io/badge/Architecture-Event%20Loop-orange.svg)]()
+  [![Status](https://img.shields.io/badge/Status-Completed-success.svg)]()
+</div>
 
 ---
 
-### Bước 2: Đọc dữ liệu từ File
+> **💡 Kiến trúc cốt lõi:** Phần mềm được thiết kế theo mô hình **Vòng lặp sự kiện (Event Loop)** kết hợp với cơ chế **Định tuyến (Router)** để điều hướng xử lý luồng dữ liệu (Data Flow) giữa các Module một cách mượt mà, tốc độ cao và tuyệt đối không rò rỉ bộ nhớ.
 
-Hệ thống mở file `restaurant.txt`.
+## 🟢 GIAI ĐOẠN 1: KHỞI ĐỘNG HỆ THỐNG (BOOTING)
+*Tiến trình chạy ngầm ngay khi khởi chạy file `QuanLyNhaHang.exe`, trước khi giao diện UI xuất hiện.*
 
-Nếu file có dữ liệu, chương trình sẽ đọc từng dòng và tạo thành các món ăn trong Linked List.
+| Bước | Hành động | Mô tả chi tiết |
+| :---: | :--- | :--- |
+| 1️⃣ | **Khởi tạo trạng thái gốc** | Khai báo 7 con trỏ quản lý (`menuHead`, `bstRoot`, `undoTop`...) và gán `NULL` để chống lỗi con trỏ hoang. |
+| 2️⃣ | **Auto-Load (Khôi phục)** | Đọc dữ liệu từ file vật lý `data/restaurant.txt` và nạp vào **Singly Linked List**. |
+| 3️⃣ | **Đồng bộ hóa (Initial Sync)** | Duyệt List một lần để đẩy toàn bộ dữ liệu sang **Cây BST**, chuẩn bị cho tìm kiếm siêu tốc. |
+| 4️⃣ | **Ghi Log hệ thống** | Thêm dòng nhật ký vào **Doubly Linked List**: *"Hệ thống khởi động thành công"*. |
 
-Ví dụ:
+<br>
 
-``` 
-M01 Pho 50000
-M02 ComTam 45000
-M03 BunBo 55000
-```
+## 🟡 GIAI ĐOẠN 2: VÒNG LẶP ĐIỀU HƯỚNG (EVENT LOOP)
+*Hệ thống duy trì trạng thái hoạt động liên tục qua vòng lặp `while(1)`.*
 
-Sau khi đọc xong:
+- **🖥️ Hiển thị giao diện:** In bảng Menu chính gồm 11 chức năng.
+- **🛡️ Tấm khiên bảo vệ (Input Shield):**
+  - Chờ người dùng nhập phím lựa chọn.
+  - ⚠️ **Bẫy lỗi:** Nếu nhập sai kiểu dữ liệu (nhập chữ thay vì số), hàm `xoaBoNhoDem()` sẽ kích hoạt để dọn sạch rác trong RAM, ngăn chặn lỗi trôi lệnh (Crash).
+- **🔀 Định tuyến xử lý:** Dựa trên số đã chọn, trình `switch-case` gọi các hàm Giao diện (`ui...`) tương ứng để bắt đầu xử lý nghiệp vụ.
 
-``` 
-M01
- │
- ▼
-M02
- │
- ▼
-M03
-```
+<br>
 
----
+## 🔵 GIAI ĐOẠN 3: XỬ LÝ NGHIỆP VỤ CỐT LÕI (CORE LOGIC)
+*Sự phối hợp nhịp nhàng giữa 5 cấu trúc dữ liệu khi có thay đổi xảy ra. (Bấm vào từng luồng bên dưới để xem chi tiết):*
 
-### Bước 3: Xây dựng BST
+<details>
+<summary><b>📌 Luồng 1: Thêm / Xóa / Sửa món (Đồng bộ CRUD)</b></summary>
+<br>
 
-Sau khi Linked List hoàn tất, hệ thống duyệt toàn bộ danh sách để tạo BST.
+*Sự phối hợp thời gian thực của cả 3 thành viên:*
+1. **Validate:** Kiểm tra trùng mã món trên List *(Phát)*.
+2. **Update:** Cập nhật dữ liệu vật lý vào **Linked List** *(Phát)*.
+3. **Sync:** Cập nhật nút tương ứng trên **Cây BST** *(Hoàng)*.
+4. **Backup:** Đóng gói thông tin cũ đẩy vào đỉnh **Stack** để sẵn sàng Hoàn tác *(Lê)*.
+5. **Trace:** Ghi nhận hành động vào **Doubly Linked List** để truy vết *(Lê)*.
+</details>
 
-BST chỉ dùng để tăng tốc tìm kiếm theo **Mã món**.
+<details>
+<summary><b>👨‍🍳 Luồng 2: Phục vụ nhà bếp (Queue)</b></summary>
+<br>
 
-Ví dụ:
+- 📥 **Order (Enqueue):** Khách gọi món ➔ Đẩy vào đuôi hàng đợi.
+- 📤 **Serve (Dequeue):** Bếp làm xong ➔ Lấy từ đầu hàng đợi ra phục vụ. Tuân thủ nghiêm ngặt nguyên tắc **FIFO (First In - First Out)**.
+</details>
 
-``` 
-        M02
-       /   \
-     M01   M03
-```
+<details>
+<summary><b>⏪ Luồng 3: Cỗ máy thời gian Hoàn tác (Stack)</b></summary>
+<br>
 
----
+- Quản lý bấm phím `8` ➔ Hệ thống kiểm tra **Stack**.
+- Lấy thao tác gần nhất ở Đỉnh (**LIFO**) và thực hiện hành động đảo ngược.
+- Khôi phục dữ liệu gốc ngay lập tức với tốc độ **O(1)**.
+</details>
 
-### Bước 4: Hiển thị Menu
+<details>
+<summary><b>🔍 Luồng 4: Tìm kiếm siêu tốc (BST)</b></summary>
+<br>
 
-Sau khi dữ liệu đã sẵn sàng, Menu chính xuất hiện.
+- Hệ thống bỏ qua việc duyệt tuần tự mất thời gian của Linked List.
+- Chui thẳng vào **Cây nhị phân tìm kiếm (BST)**.
+- So sánh và rẽ nhánh liên tục, tìm ra món ăn với độ phức tạp **O(log n)**.
+</details>
 
-Người dùng bắt đầu sử dụng chương trình.
+<br>
 
----
+## 🔴 GIAI ĐOẠN 4: THOÁT HỆ THỐNG AN TOÀN (SHUTDOWN)
+*Kịch bản kích hoạt khi người dùng chọn phím `0`.*
 
-# GIAI ĐOẠN 2: QUẢN LÝ THỰC ĐƠN
-
-## 1. Thêm món ăn
-
-Người dùng chọn chức năng **Thêm món**.
-
-Hệ thống thực hiện:
-
-1. Nhập Mã món, Tên món và Giá.
-2. Kiểm tra Mã món đã tồn tại hay chưa.
-3. Nếu trùng mã → Thông báo lỗi.
-4. Nếu không trùng:
-
-   * Thêm món vào Linked List.
-   * Lưu thao tác vào Stack (phục vụ Undo).
-   * Cập nhật BST.
-   * Ghi lịch sử vào `history.txt`.
-5. Thông báo **Thêm thành công**.
-
----
-
-## 2. Hiển thị danh sách
-
-Người dùng chọn **Hiển thị**.
-
-Hệ thống duyệt toàn bộ Linked List và in ra bảng thực đơn.
-
-Ví dụ:
-
-``` 
-+------+------------+---------+
-| Mã   | Tên món    | Giá     |
-+------+------------+---------+
-| M01  | Phở        | 50000   |
-| M02  | Cơm Tấm    | 45000   |
-| M03  | Bún Bò     | 55000   |
-+------+------------+---------+
-```
+- [x] **Auto-Save (Bảo vệ dữ liệu):** Tự động ghi đè an toàn toàn bộ dữ liệu từ RAM xuống file vật lý `restaurant.txt` trước khi tắt.
+- [x] **Memory Cleanup (Giải phóng RAM):** Hệ thống "Xe rác" duyệt qua toàn bộ các cấu trúc dữ liệu (List, Cây, Stack, Queue) và gọi hàm `free()` cho từng Node.
+- [x] **Kết thúc tiến trình:** Trình điều hành trả về `return 0;`, hoàn trả 100% bộ nhớ cho máy tính, triệt tiêu hoàn toàn Memory Leak.
 
 ---
-
-## 3. Tìm kiếm
-
-Người dùng có thể tìm theo:
-
-### Theo Mã
-
-* Tìm trên BST.
-* Nếu có → Hiển thị thông tin.
-* Nếu không → Báo không tìm thấy.
-
-### Theo Tên
-
-* Duyệt Linked List.
-* Hiển thị tất cả món phù hợp.
-
-### Theo Khoảng Giá
-
-Ví dụ:
-
-``` 
-30000 → 60000
-```
-
-Hệ thống hiển thị tất cả món nằm trong khoảng giá đó.
-
----
-
-## 4. Cập nhật giá
-
-Người dùng nhập Mã món.
-
-Sau đó nhập Giá mới.
-
-Hệ thống sẽ:
-
-1. Tìm món ăn.
-2. Lưu dữ liệu cũ vào Stack.
-3. Cập nhật giá mới.
-4. Đồng bộ lại BST.
-5. Ghi lịch sử thao tác.
-6. Thông báo thành công.
-
----
-
-## 5. Xóa món
-
-Người dùng nhập Mã món.
-
-Hệ thống:
-
-1. Kiểm tra món có tồn tại.
-2. Lưu thông tin món vào Stack.
-3. Xóa khỏi Linked List.
-4. Đồng bộ lại BST.
-5. Ghi lịch sử thao tác.
-6. Thông báo xóa thành công.
-
----
-
-## 6. Sắp xếp
-
-Người dùng có thể chọn:
-
-* Sắp xếp theo Giá.
-* Sắp xếp theo Tên.
-
-Sau khi sắp xếp xong, hệ thống hiển thị lại danh sách mới.
-
----
-
-# GIAI ĐOẠN 3: QUẢN LÝ ĐẶT MÓN (QUEUE)
-
-Queue hoạt động theo nguyên tắc **FIFO (First In - First Out)**.
-
-## Khách gọi món
-
-Ví dụ:
-
-Khách 1 gọi:
-
-``` 
-M01
-```
-
-Queue:
-
-``` 
-M01
-```
-
-Khách 2 gọi:
-
-``` 
-M02
-```
-
-Queue:
-
-``` 
-M01
- │
- ▼
-M02
-```
-
-Khách 3 gọi:
-
-``` 
-M04
-```
-
-Queue:
-
-``` 
-M01
- │
- ▼
-M02
- │
- ▼
-M04
-```
-
-Khách gọi trước sẽ được phục vụ trước.
-
----
-
-## Bếp phục vụ
-
-Khi bếp hoàn thành món đầu tiên:
-
-Queue:
-
-``` 
-M01
- │
- ▼
-M02
- │
- ▼
-M04
-```
-
-Sau khi phục vụ:
-
-``` 
-M02
- │
- ▼
-M04
-```
-
-Đồng thời hệ thống:
-
-* Cộng doanh thu.
-* Ghi lịch sử phục vụ.
-
----
-
-# GIAI ĐOẠN 4: HOÀN TÁC (UNDO)
-
-Stack hoạt động theo nguyên tắc **LIFO (Last In - First Out)**.
-
-Mỗi khi:
-
-* Thêm món.
-* Xóa món.
-* Cập nhật giá.
-
-Hệ thống sẽ lưu thông tin cũ vào Stack.
-
-Ví dụ:
-
-Người dùng xóa món:
-
-``` 
-M03
-```
-
-Stack:
-
-``` 
-TOP
- │
- ▼
-XOA - M03
-```
-
-Nếu người dùng chọn **Undo**:
-
-Hệ thống sẽ:
-
-1. Lấy dữ liệu trên đỉnh Stack.
-2. Khôi phục món ăn về trạng thái trước đó.
-3. Đồng bộ lại BST.
-4. Ghi lịch sử hoàn tác.
-
-Kết quả:
-
-M03 xuất hiện lại trong danh sách.
-
----
-
-# GIAI ĐOẠN 5: THỐNG KÊ
-
-Người dùng chọn **Thống kê**.
-
-Hệ thống tính:
-
-* Tổng doanh thu.
-* Giá trung bình của toàn bộ thực đơn.
-
-Sau đó hiển thị kết quả ra màn hình.
-
----
-
-# GIAI ĐOẠN 6: THOÁT CHƯƠNG TRÌNH
-
-Khi người dùng chọn **Thoát**.
-
-Hệ thống thực hiện theo thứ tự:
-
-### Bước 1
-
-Lưu toàn bộ Linked List xuống file:
-
-``` 
-restaurant.txt
-```
-
----
-
-### Bước 2
-
-Giải phóng toàn bộ bộ nhớ:
-
-* Linked List
-* Queue
-* Stack
-* BST
-
----
-
-### Bước 3
-
-Kết thúc chương trình.
-
----
-
-# TÓM TẮT LUỒNG HOẠT ĐỘNG
-
-``` 
-Mở chương trình
-      │
-      ▼
-Đọc dữ liệu từ restaurant.txt
-      │
-      ▼
-Tạo Linked List
-      │
-      ▼
-Xây dựng BST
-      │
-      ▼
-Hiển thị Menu
-      │
-      ├── Thêm món
-      ├── Hiển thị danh sách
-      ├── Tìm kiếm
-      ├── Cập nhật giá
-      ├── Xóa món
-      ├── Sắp xếp
-      ├── Đặt món (Queue)
-      ├── Phục vụ món (Queue)
-      ├── Undo (Stack)
-      ├── Thống kê
-      └── Thoát
-              │
-              ▼
-      Lưu dữ liệu xuống File
-              │
-              ▼
-      Giải phóng bộ nhớ
-              │
-              ▼
-      Kết thúc chương trình
-```
-
----
-
-# PHÂN CÔNG THÀNH VIÊN
-
-## A
-
-* Quản lý Linked List.
-* Thêm, sửa, xóa, hiển thị món ăn.
-* Đọc/Ghi dữ liệu từ file.
-
-## B
-
-* Quản lý Stack (Undo).
-* Quản lý Queue (Đặt món).
-* Ghi lịch sử thao tác.
-* Thống kê doanh thu và giá trung bình.
-
-## C
-
-* Xây dựng và quản lý BST.
-* Tìm kiếm theo Mã món.
-* Tìm kiếm theo Tên và Khoảng giá.
-* Sắp xếp danh sách.
-
-## Leader
-
-* Thiết kế cấu trúc dự án.
-* Thiết kế `restaurant.h`.
-* Xây dựng Menu (`main.c`).
-* Điều phối luồng chương trình.
-* Ghép code của các thành viên.
-* Kiểm thử và sửa lỗi khi tích hợp.
-
+<div align="center">
+  <i>Đồ án Cấu Trúc Dữ Liệu & Thuật Toán - Thực hiện bởi Nhóm 5</i>
+</div>

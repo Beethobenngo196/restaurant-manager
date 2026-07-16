@@ -7,3 +7,5 @@ MON07,Nuoc Ep Cam,30000
 MON08,Mi Cay Sasin Cap 7,45000
 MON09,Ga Ran Phan Nhom,120000
 MON10,Kem Khoai Mon,15000
+MON01,Chao Bo,40000
+M01,Ga,100000

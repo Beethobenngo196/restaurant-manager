@@ -1,66 +1,62 @@
-#include "restaurant.h"
+#include "../include/restaurant.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
-/*=========================================================
-    CAC HAM NOI BO (STATIC HELPER FUNCTIONS)
-=========================================================*/
+/* => KHAI BAO HAM IN MON AN (CUA PHAT) DE SU DUNG TRONG HOANG.C <= */
+extern void inMonAn(MonAn mon);
+
+/*==============================================================================
+    CAC HAM HO TRO NOI BO CHO CAY BST (STATIC HELPER FUNCTIONS)
+==============================================================================*/
 
 /*
- * Tao mot TreeNode moi
+ * Cấp phát bộ nhớ RAM cho mot Node Cây (TreeNode) moi
  */
 static TreeNode* taoTreeNode(MonAn mon)
 {
     TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
-
     if (node == NULL)
     {
         return NULL;
     }
-
     node->data = mon;
     node->left = NULL;
     node->right = NULL;
-
     return node;
 }
 
 /*
- * Hoan doi du lieu cua hai node Linked List
+ * Ghi thong tin 1 mon an ra file backup
  */
-static void hoanDoiMonAn(Node* a, Node* b)
+static void ghiMonAnRaFile(TreeNode* root, FILE* f)
 {
-    MonAn temp = a->data;
-    a->data = b->data;
-    b->data = temp;
+    if (root != NULL && f != NULL)
+    {
+        fprintf(f, "%s,%s,%d\n", root->data.maMon, root->data.tenMon, root->data.giaTien);
+    }
 }
 
 /*
- * In tieu de bang
+ * Ham de quy ho tro ghi cay theo Pre-order ra file
  */
-static void inTieuDeBang(void)
+static void ghiCayPreorderHelper(TreeNode* root, FILE* f)
 {
-    printf("%-10s %-30s %-10s\n",
-           "Ma Mon",
-           "Ten Mon",
-           "Gia");
+    if (root == NULL) return;
+    ghiMonAnRaFile(root, f);
+    ghiCayPreorderHelper(root->left, f);
+    ghiCayPreorderHelper(root->right, f);
 }
 
-/*
- * In mot mon an
- */
-static void inMonAn(MonAn mon)
-{
-    printf("%-10s %-30s %-10d\n",
-           mon.maMon,
-           mon.tenMon,
-           mon.giaTien);
-}
-
-/*=========================================================
-    BINARY SEARCH TREE (BST) MODULE
-=========================================================*/
+/*==============================================================================
+    MODULE 3: CAY NHI PHAN TIM KIEM (PURE BST MODULE) - HOANG
+    100% thao tac tren cau truc TreeNode, khong dung den Linked List!
+==============================================================================*/
 
 /*
- * Them mot mon vao cay BST
+ * 1. Them mot mon an vao cay BST theo Ma mon (De quy)
+ * Quy tac: Ma nho hon di ben Trai, Ma lon hon di ben Phai
+ * [BAY LOI]: Khong cho phep trung ma mon de dam bao cau truc BST chuan!
  */
 TreeNode* themVaoCayBST(TreeNode* root, MonAn mon)
 {
@@ -69,283 +65,102 @@ TreeNode* themVaoCayBST(TreeNode* root, MonAn mon)
         return taoTreeNode(mon);
     }
 
-    if (strcmp(mon.maMon, root->data.maMon) < 0)
+    int cmp = strcmp(mon.maMon, root->data.maMon);
+    if (cmp < 0)
     {
         root->left = themVaoCayBST(root->left, mon);
     }
-    else
+    else if (cmp > 0)
     {
         root->right = themVaoCayBST(root->right, mon);
     }
-
+    // Neu cmp == 0 (Trung ma mon), tu dong bo qua, khong tao Node rac tren cay!
     return root;
 }
 
 /*
- * Tim kiem theo ma mon
+ * 2. Tim kiem mon an tren cay BST theo MA MON
+ * Tốc độ xử lý: O(log n) nhờ tận dụng cờ định hướng Left/Right
  */
 TreeNode* timKiemTheoMaBST(TreeNode* root, char* maMon)
 {
-    if (root == NULL)
-    {
-        return NULL;
-    }
-
-    int cmp = strcmp(maMon, root->data.maMon);
-
-    if (cmp == 0)
+    if (root == NULL || strcmp(root->data.maMon, maMon) == 0)
     {
         return root;
     }
 
-    if (cmp < 0)
+    if (strcmp(maMon, root->data.maMon) < 0)
     {
         return timKiemTheoMaBST(root->left, maMon);
     }
-
-    return timKiemTheoMaBST(root->right, maMon);
+    else
+    {
+        return timKiemTheoMaBST(root->right, maMon);
+    }
 }
 
 /*
- * Duyet cay theo Preorder (NLR)
+ * 3. Duyet cay theo Pre-order (NLR: Goc -> Trai -> Phai)
+ * Ung dung: In cau truc phan nhanh Goc cua thuc don
  */
 void duyetCayPreorder(TreeNode* root)
 {
-    if (root == NULL)
-    {
-        return;
-    }
-
+    if (root == NULL) return;
     inMonAn(root->data);
-
     duyetCayPreorder(root->left);
     duyetCayPreorder(root->right);
 }
 
 /*
- * Duyet cay theo Inorder (LNR)
+ * 4. Duyet cay theo In-order (LNR: Trai -> Goc -> Phai)
+ * Ung dung: TU DONG IN THUC DON SAP XEP TANG DAN A-Z theo Ma mon!
+ * (Nho tinh chat BST, thuc don tu dong duoc sort ma khong can thuat toan sap xep)
  */
 void duyetCayInorder(TreeNode* root)
 {
-    if (root == NULL)
-    {
-        return;
-    }
-
+    if (root == NULL) return;
     duyetCayInorder(root->left);
-
     inMonAn(root->data);
-
     duyetCayInorder(root->right);
 }
 
 /*
- * Duyet cay theo Postorder (LRN)
+ * 5. Duyet cay theo Post-order (LRN: Trai -> Phai -> Goc)
+ * Ung dung: Quet tu la len goc (Ho tro co che don dep RAM)
  */
 void duyetCayPostorder(TreeNode* root)
 {
-    if (root == NULL)
-    {
-        return;
-    }
-
+    if (root == NULL) return;
     duyetCayPostorder(root->left);
     duyetCayPostorder(root->right);
-
     inMonAn(root->data);
 }
 
 /*
- * Giai phong bo nho BST
+ * 6. Giai phong bo nho RAM cho cay BST (Duyet Post-order tu la len goc)
+ * Tieu huy Node con truoc khi xoa Node cha -> Dam bao 0% Memory Leak!
  */
 void giaiPhongCay(TreeNode* root)
 {
-    if (root == NULL)
-    {
-        return;
-    }
-
+    if (root == NULL) return;
     giaiPhongCay(root->left);
     giaiPhongCay(root->right);
-
     free(root);
 }
 
-/*=========================================================
-    SEARCH MODULE (LINKED LIST)
-=========================================================*/
-
 /*
- * Tim kiem theo ten mon
+ * 7. Sao luu cau truc cay BST ra file Backup bang chuoi Pre-order
+ * Giup khi read file nap lai vao RAM, cay khong bi mat dang can bang cu
  */
-void timKiemTheoTen(Node* head, char* tenMon)
+void saoLuuCayBST(TreeNode* root, const char* tenFile)
 {
-    if (head == NULL)
+    FILE* f = fopen(tenFile, "w");
+    if (f == NULL)
     {
-        printf("Danh sach rong.\n");
+        printf("[LOI] Khong the tao file backup %s!\n", tenFile);
         return;
     }
-
-    Node* p = head;
-    int timThay = 0;
-
-    printf("\n========== KET QUA TIM KIEM ==========\n");
-
-    while (p != NULL)
-    {
-        if (strcmp(p->data.tenMon, tenMon) == 0)
-        {
-            if (!timThay)
-            {
-                inTieuDeBang();
-            }
-
-            inMonAn(p->data);
-            timThay = 1;
-        }
-
-        p = p->next;
-    }
-
-    if (!timThay)
-    {
-        printf("Khong tim thay mon \"%s\".\n", tenMon);
-    }
-}
-
-/*
- * Tim kiem theo khoang gia
- */
-void timKiemTheoKhoangGia(Node* head, int giaMin, int giaMax)
-{
-    if (head == NULL)
-    {
-        printf("Danh sach rong.\n");
-        return;
-    }
-
-    Node* p = head;
-    int timThay = 0;
-
-    if (giaMin > giaMax)
-    {
-        int temp = giaMin;
-        giaMin = giaMax;
-        giaMax = temp;
-    }
-
-    printf("\n======= KET QUA TIM KIEM THEO GIA =======\n");
-
-    while (p != NULL)
-    {
-        if (p->data.giaTien >= giaMin && p->data.giaTien <= giaMax)
-        {
-            if (!timThay)
-            {
-                inTieuDeBang();
-            }
-
-            inMonAn(p->data);
-            timThay = 1;
-        }
-
-        p = p->next;
-    }
-
-    if (!timThay)
-    {
-        printf("Khong co mon nao trong khoang gia %d - %d.\n",
-               giaMin,
-               giaMax);
-    }
-}
-
-/*=========================================================
-    SORT MODULE (LINKED LIST)
-=========================================================*/
-
-/*
- * Sap xep theo ten
- * tangDan = 1 : A -> Z
- * tangDan = 0 : Z -> A
- */
-void sapXepTheoTen(Node** head, int tangDan)
-{
-    if (head == NULL || *head == NULL || (*head)->next == NULL)
-    {
-        return;
-    }
-
-    Node* p;
-    Node* q;
-
-    for (p = *head; p != NULL; p = p->next)
-    {
-        for (q = p->next; q != NULL; q = q->next)
-        {
-            int cmp = strcmp(p->data.tenMon, q->data.tenMon);
-
-            if ((tangDan && cmp > 0) || (!tangDan && cmp < 0))
-            {
-                hoanDoiMonAn(p, q);
-            }
-        }
-    }
-}
-
-/*
- * Sap xep theo ma
- * tangDan = 1 : Tang dan
- * tangDan = 0 : Giam dan
- */
-void sapXepTheoMa(Node** head, int tangDan)
-{
-    if (head == NULL || *head == NULL || (*head)->next == NULL)
-    {
-        return;
-    }
-
-    Node* p;
-    Node* q;
-
-    for (p = *head; p != NULL; p = p->next)
-    {
-        for (q = p->next; q != NULL; q = q->next)
-        {
-            int cmp = strcmp(p->data.maMon, q->data.maMon);
-
-            if ((tangDan && cmp > 0) || (!tangDan && cmp < 0))
-            {
-                hoanDoiMonAn(p, q);
-            }
-        }
-    }
-}
-
-/*
- * Sap xep theo gia
- * tangDan = 1 : Gia thap -> cao
- * tangDan = 0 : Gia cao -> thap
- */
-void sapXepTangTheoGia(Node** head, int tangDan)
-{
-    if (head == NULL || *head == NULL || (*head)->next == NULL)
-    {
-        return;
-    }
-
-    Node* p;
-    Node* q;
-
-    for (p = *head; p != NULL; p = p->next)
-    {
-        for (q = p->next; q != NULL; q = q->next)
-        {
-            if ((tangDan && p->data.giaTien > q->data.giaTien) ||
-                (!tangDan && p->data.giaTien < q->data.giaTien))
-            {
-                hoanDoiMonAn(p, q);
-            }
-        }
-    }
+    ghiCayPreorderHelper(root, f);
+    fclose(f);
+    printf("=> Da sao luu cau truc cay BST ra file [%s] theo chuoi Pre-order!\n", tenFile);
 }
